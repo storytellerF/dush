@@ -1,3 +1,4 @@
+import com.storyteller_f.jksify.getenv
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -7,7 +8,14 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.room)
+    alias(libs.plugins.jksify)
 }
+
+val signPath: String? = getenv("storyteller_f_sign_path")
+val signKey: String? = getenv("storyteller_f_sign_key")
+val signAlias: String? = getenv("storyteller_f_sign_alias")
+val signStorePassword: String? = getenv("storyteller_f_sign_store_password")
+val signKeyPassword: String? = getenv("storyteller_f_sign_key_password")
 
 kotlin {
     compilerOptions {
@@ -58,9 +66,27 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+    signingConfigs {
+        val signStorePath = when {
+            signPath != null -> File(signPath)
+            signKey != null -> layout.buildDirectory.file("signing/signing_key.jks").get().asFile
+            else -> null
+        }
+        if (signStorePath != null && signAlias != null && signStorePassword != null && signKeyPassword != null) {
+            create("release") {
+                keyAlias = signAlias
+                keyPassword = signKeyPassword
+                storeFile = signStorePath
+                storePassword = signStorePassword
+            }
+        }
+    }
     buildTypes {
         getByName("release") {
             isMinifyEnabled = false
+            val releaseSignConfig = signingConfigs.findByName("release")
+            if (releaseSignConfig != null)
+                signingConfig = releaseSignConfig
         }
     }
     compileOptions {
