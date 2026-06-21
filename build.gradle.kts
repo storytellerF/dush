@@ -11,4 +11,5 @@ plugins {
     alias(libs.plugins.kotlinSerialization) apply false
     alias(libs.plugins.room) apply false
     alias(libs.plugins.jksify) apply false
+    alias(libs.plugins.screenshot) apply false
 }

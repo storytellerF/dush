@@ -234,7 +234,7 @@ private fun ChatThreadScreen(threadId: String) {
 }
 
 @Composable
-private fun MessageRow(message: ChatMessageEntity) {
+internal fun MessageRow(message: ChatMessageEntity) {
     val color = if (message.role == MessageRole.User) {
         MaterialTheme.colorScheme.primaryContainer
     } else {
@@ -399,7 +399,7 @@ private fun SettingsScreen() {
 }
 
 @Composable
-private fun ListCard(
+internal fun ListCard(
     title: String,
     subtitle: String,
     onClick: () -> Unit,

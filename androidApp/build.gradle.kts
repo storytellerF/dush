@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.room)
     alias(libs.plugins.jksify)
+    alias(libs.plugins.screenshot)
 }
 
 val signPath: String? = getenv("storyteller_f_sign_path")
@@ -47,10 +48,14 @@ dependencies {
     implementation(libs.compose.uiToolingPreview)
     debugImplementation(libs.compose.uiTooling)
 
+    screenshotTestImplementation(libs.screenshot.validation.api)
+    screenshotTestImplementation(libs.compose.uiTooling)
+
     ksp(libs.androidx.room.compiler)
 }
 
 android {
+    experimentalProperties["android.experimental.enableScreenshotTest"] = true
     namespace = "com.storyteller_f.dush"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
