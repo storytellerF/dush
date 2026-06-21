@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -14,6 +13,7 @@ import com.android.tools.screenshot.PreviewTest
 import com.storyteller_f.dush.agent.data.ChatMessageEntity
 import com.storyteller_f.dush.agent.data.MessageRole
 import com.storyteller_f.dush.agent.data.MessageStatus
+import com.storyteller_f.dush.agent.ui.DushTheme
 import com.storyteller_f.dush.agent.ui.ListCard
 import com.storyteller_f.dush.agent.ui.MessageRow
 
@@ -21,7 +21,7 @@ import com.storyteller_f.dush.agent.ui.MessageRow
 @Preview(showBackground = true)
 @Composable
 fun UserMessagePreview() {
-    MaterialTheme {
+    DushTheme {
         MessageRow(
             ChatMessageEntity(
                 id = "1",
@@ -41,7 +41,7 @@ fun UserMessagePreview() {
 @Preview(showBackground = true)
 @Composable
 fun AssistantMessagePreview() {
-    MaterialTheme {
+    DushTheme {
         MessageRow(
             ChatMessageEntity(
                 id = "2",
@@ -61,7 +61,7 @@ fun AssistantMessagePreview() {
 @Preview(showBackground = true)
 @Composable
 fun StreamingMessagePreview() {
-    MaterialTheme {
+    DushTheme {
         MessageRow(
             ChatMessageEntity(
                 id = "3",
@@ -81,7 +81,7 @@ fun StreamingMessagePreview() {
 @Preview(showBackground = true)
 @Composable
 fun ListCardPreview() {
-    MaterialTheme {
+    DushTheme {
         ListCard(
             title = "Gemma 2B",
             subtitle = "Available | LiterTLM | 1024 MB",
@@ -100,7 +100,7 @@ fun ChatConversationPreview() {
         ChatMessageEntity("3", "t1", MessageRole.User, "Tell me more", MessageStatus.Complete, 0, 0, null),
         ChatMessageEntity("4", "t1", MessageRole.Assistant, "", MessageStatus.Streaming, 0, 0, null),
     )
-    MaterialTheme {
+    DushTheme {
         Surface {
             Column(
                 Modifier.fillMaxWidth().padding(16.dp),
