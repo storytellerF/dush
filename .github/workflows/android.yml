@@ -27,6 +27,8 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build
         env:
+          ORG_GRADLE_PROJECT_gpr_user: ${{ github.actor }}
+          ORG_GRADLE_PROJECT_gpr_key: ${{ secrets.GITHUB_TOKEN }}
           storyteller_f_sign_key: ${{ secrets.SIGNING_KEY }}
           storyteller_f_sign_alias: ${{ secrets.ALIAS }}
           storyteller_f_sign_store_password: ${{ secrets.STORE_PASSWORD }}

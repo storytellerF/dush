@@ -25,6 +25,9 @@ jobs:
 
       - name: Validate Compose Screenshots
         run: ./gradlew :androidApp:validateDebugScreenshotTest
+        env:
+          ORG_GRADLE_PROJECT_gpr_user: ${{ github.actor }}
+          ORG_GRADLE_PROJECT_gpr_key: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload Screenshot Test Report
         if: failure()
