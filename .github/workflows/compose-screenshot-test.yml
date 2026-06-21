@@ -1,5 +1,8 @@
 name: Compose Screenshot Test
 
+permissions:
+  packages: read
+
 on:
   pull_request:
     paths:
@@ -27,7 +30,7 @@ jobs:
         run: ./gradlew :androidApp:validateDebugScreenshotTest
         env:
           ORG_GRADLE_PROJECT_gpr_user: ${{ github.actor }}
-          ORG_GRADLE_PROJECT_gpr_key: ${{ secrets.GITHUB_TOKEN }}
+          ORG_GRADLE_PROJECT_gpr_key: ${{ secrets.GPR_TOKEN }}
 
       - name: Upload Screenshot Test Report
         if: failure()
