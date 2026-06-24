@@ -26,8 +26,45 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      - name: Run tests
-        run: ./gradlew check
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Appium
+        run: |
+          npm install -g appium
+          appium driver install uiautomator2
+
+      - name: Run tests (critical Appium tests only)
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 36
+          arch: x86_64
+          target: google_apis
+          profile: pixel_6
+          disable-animations: true
+          script: |
+            appium --log "$RUNNER_TEMP/appium.log" --log-timestamp &
+            adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done'
+            ./gradlew check -PappiumTags=critical
+
+      - name: Upload Appium artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: appium-artifacts
+          path: |
+            build/appium-failures/
+            build/appium-videos/
+            ${{ runner.temp }}/appium.log
+          if-no-files-found: ignore
 
   build:
     if: github.event_name == 'push'
