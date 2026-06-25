@@ -44,6 +44,8 @@ jobs:
           disable-animations: true
           script: |
             appium --log "$RUNNER_TEMP/appium.log" --log-timestamp &
+            APPIUM_PID=$!
+            trap 'kill "$APPIUM_PID" 2>/dev/null || true' EXIT
             adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done'
             ./gradlew check -PappiumTags=critical
 
