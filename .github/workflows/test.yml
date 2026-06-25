@@ -43,11 +43,15 @@ jobs:
           profile: pixel_6
           disable-animations: true
           script: |
-            appium --log "$RUNNER_TEMP/appium.log" --log-timestamp &
+            # Detach Appium from the step's stdout/stderr so the background
+            # process never holds the runner pipe open (otherwise the step
+            # hangs after the build finishes, waiting for EOF).
+            appium --log "$RUNNER_TEMP/appium.log" --log-timestamp \
+              > "$RUNNER_TEMP/appium.out" 2>&1 < /dev/null &
             APPIUM_PID=$!
-            trap 'kill "$APPIUM_PID" 2>/dev/null || true' EXIT
+            trap 'kill "$APPIUM_PID" 2>/dev/null || true; pkill -f appium 2>/dev/null || true' EXIT
             adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done'
-            ./gradlew check -PappiumTags=critical
+            ./gradlew check -PappiumTags=critical --no-daemon
 
       - name: Upload Appium artifacts
         if: failure()
