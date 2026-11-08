@@ -1,7 +1,5 @@
-<a id="development"></a>
 # 开发
 
-<a id="android-band-voice"></a>
 ## Android 手环语音
 
 `androidApp/.../agent/band` 管理 Android 专用 BLE 适配器、各连接的协议状态、安全外设注册表、本地语音模型和前台服务。UI 操作通过 `PeripheralHost` 执行；识别、解码、磁盘和加密工作不占用 UI 线程。对话与消息存储继续使用已有共享 Room schema，本功能不改变它。
@@ -21,7 +19,6 @@ Android MediaCodec 解码原始 Opus；Vosk 使用解码器实际的 PCM 采样�
 
 设备操作前取得共享设备租约。Appium 测试会清除 debug 应用数据，应在配置真实凭据和模型之前运行。可选的真实解码器测试需要在 debug 应用的 `no_backup/band-speech/` 放置已解压的 `vosk-model-small-cn-0.22` 文件夹，并在 `cache/band-test-opus.bin` 放置获准使用、带长度前缀的 codec-1 Opus 录音，再运行 `:androidApp:connectedDebugAndroidTest`。缺少这些私有夹具时语音测试跳过。自动检查后，使用实体手环手动验证实时中间文本、最终消息路由、回复和解绑。
 
-<a id="android-application-ids"></a>
 ## Android 应用 ID
 
 | 构建类型 | 应用 ID |
@@ -42,7 +39,6 @@ Alpha 取代原 daily 构建类型，以 `.alpha` 代替 `.daily`。已安装的
 
 Appium 测试任务安装 debug，默认目标为 `com.storyteller_f.dush.debug`。已明确准备好其他构建时，可通过 `APP_PACKAGE` 覆盖目标包。默认 Activity 是完整限定名 `com.storyteller_f.dush.MainActivity`，因为类所在的包不随应用 ID 后缀变化。
 
-<a id="room-schema-ownership"></a>
 ## Room schema 归属
 
 `AgentDatabase` 及其实体、DAO 和迁移属于 `shared/commonMain`。Android 与 JVM KSP 任务统一使用 `shared/schemas` 作为权威 schema 历史。所有版本化 JSON 文件都保留在这里；版本 1、2、3，以及已有 `MIGRATION_1_2` / `MIGRATION_2_3` 迁移链保持不变。
@@ -74,7 +70,6 @@ Appium 测试任务安装 debug，默认目标为 `com.storyteller_f.dush.debug`
 `PeripheralStoreDeviceTest` 使用独立缓存目录覆盖旧配置迁移、加密持久化、解绑保留凭据、重复地址和移除；`PeripheralsTest` 覆盖页面操作，保留实际设备数据并只操作离线虚拟外设。
 
 
-<a id="peripheral-health-data"></a>
 ## 外设健康数据
 
 `BandHealthConnection` 共享现有连接管理者的事件循环。步数使用 Huami 特征 7，心率通知使用标准 Heart Rate Measurement 特征，单次测量使用手动控制命令。活动历史使用特征 4/5（类型 01 和 02）、带计数器校验且有界的传输，以及包含时区的手环起始时间戳。不发送活动确认或删除命令 03，因此可重复读取。历史解析器和协议选择已与 Gadgetbridge 的 Huami 获取实现核对；没有引入 Gadgetbridge 应用源码或库依赖。
@@ -87,7 +82,6 @@ Appium 测试任务安装 debug，默认目标为 `com.storyteller_f.dush.debug`
 
 测试：协议计数器、畸形或截断数据、心率哨兵值、跨午夜和夏令时的睡眠汇总，以及跨对话隔离均有单元测试。`PeripheralHealthStoreDeviceTest` 覆盖加密、保留策略、重复同步和已删除设备竞态。`PeripheralHealthRuntimeDeviceTest` 验证健康上下文到达模型适配器且不修改已保存的 Agent 提示词。`PeripheralHealthTest` 针对已添加的实体外设运行非破坏性的同步与 UI 测试。
 
-<a id="inference-service-architecture"></a>
 ## 推理服务架构
 
 `shared/commonMain` 管理 `ConnectionRepository`、`AgentRepository`、`ChatRepository`、`ConnectionHost`、`InferenceRuntime`、`KoogInferenceRuntime` 和 `KoogAgentRunner`。UUID 与时间使用 Kotlin 公共 API。Koog 1.3 提供方客户端和显式注入的 Ktor 传输遵循 summer 的集成方式，不打包完整 agent 包或 LiteRT 运行时。OpenAI 兼容 HTTP（含桌面 llmd）使用 Chat Completions SSE。每次收集自行管理并关闭客户端和传输。提供方错误映射为安全消息，不保留响应正文、URL、凭据或异常原因。绝不为这些客户端启用 HTTP 正文或请求头日志。
@@ -125,7 +119,6 @@ WorkManager、前台通知、完成通知、气泡和手环路由仍属于 Andro
 
 缺少任一参数时这些测试跳过。它们使用内存 dush 数据库和合成提示词。取消覆盖保留第二个 Binder 绑定，让 llmd 能完成旧请求并交付迟到回调；随后执行另一次真实推理，检查被取消行没有变化。测试不声称存在远程取消 RPC，也不停止其他客户端正在使用的模型。调用方管理的截止时间仍表现为协程取消；只有适配器自己的截止时间才转换成安全的服务超时消息。
 
-<a id="desktopjvm-workspace"></a>
 ## 桌面／JVM 工作区
 
 `WorkspaceHost` 在注入的后台串行调度器上管理窗口导航、观察列表、对话选择和命令。共享连接／Agent 编辑器内容及 `SharedDushTheme` 也供 Android 使用；Android 提供动态颜色和 llmd 授权。WorkManager、通知、气泡和 BLE 仍是 Android 适配器。未发送消息草稿由窗口 Host 按对话管理。导航恢复选定草稿，提交消息成功后移除。草稿仅保存在内存，不写入聊天历史，也不在应用退出后恢复。每个打开的对话有独立 `ThreadHost`、Room 生成的 `PagingSource` 和缓存在该 Host 作用域中的 `Pager`。Room 失效机制在数据库变化（含流式文本）后刷新消息。初始与后续页大小为 50，预取距离为 5，禁用占位符。`LazyPagingItems` 通过 Paging 的 refresh／append 加载状态处理访问提示和重试，没有并行维护的手动历史缓存或重试状态机。推理仍单独读取完整上下文。导航立即发布新 Host，并请求取消旧 Host，不等待其结束。旧分页任务无法访问新 Host 状态。清理完成前，各对话作用域仍是窗口作用域的子级，因此窗口关闭会等待所有退役会话结束后再关闭数据库。无需数据库 schema 变更。列表使用反向布局，在视觉底部保留稳定的首个哨兵。靠近历史边缘时再加载 50 条消息，并保留稳定消息键。在底部时由哨兵锚定并跟随新文本。用户向上滚动后，定位完全交给 LazyColumn：没有显式滚动命令或高度补偿，正在增长的回复内部也不例外。
